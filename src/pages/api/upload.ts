@@ -10,13 +10,13 @@ import {
 } from "@aws-sdk/client-s3";
 
 type Data = {
-  data: string;
+  data: string | any;
 };
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
   const identityPoolId: string = process.env.IDENTITY_POOL_ID || "";
-  const region = process.env.S3_UPLOAD_REGION;
-  const bucketName = process.env.S3_UPLOAD_BUCKET;
+  const region = process.env.S3_UPLOAD_REGION || "ap-northeast-1";
+  const bucketName = process.env.S3_UPLOAD_BUCKET || "lee-testbucket";
 
   const credentials = fromCognitoIdentityPool({
     client: new CognitoIdentityClient({ region }),
@@ -35,9 +35,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     Key: "01/aa",
     Body: file,
   };
-
-  const result = await s3.send(new PutObjectCommand(uploadParams));
-  console.log(result);
+  console.log(bucketName);
+  try {
+    const result = await s3.send(new PutObjectCommand(uploadParams));
+    console.log(result);
+  } catch (error) {
+    console.log(`tlqkf error : ${error}`);
+    return res.status(400).json({ data: error });
+  }
 
   return res.status(200).json({ data: "success" });
 };

@@ -14,7 +14,7 @@ type Data = {
 };
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-  const identityPoolId: string = process.env.AWS_IDENTITY_POOL_ID || "";
+  const identityPoolId: string = process.env.IDENTITY_POOL_ID || "";
   const region = process.env.S3_UPLOAD_REGION;
   const bucketName = process.env.S3_UPLOAD_BUCKET;
 

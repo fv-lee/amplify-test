@@ -1,34 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Polly } from "@aws-sdk/client-polly";
-import { CognitoIdentityClient } from "@aws-sdk/client-cognito-identity";
-import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
-import {
-  ListObjectsCommand,
-  PutObjectCommand,
-  PutObjectCommandInput,
-  S3Client,
-} from "@aws-sdk/client-s3";
+import { PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3";
+import { getS3Client } from "../../common/utils/getClients";
 
 type Data = {
   data: string | any;
 };
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-  const identityPoolId: string = process.env.IDENTITY_POOL_ID || "";
-  const region = process.env.S3_UPLOAD_REGION || "ap-northeast-1";
   const bucketName = process.env.S3_UPLOAD_BUCKET || "lee-testbucket";
-
-  const credentials = fromCognitoIdentityPool({
-    client: new CognitoIdentityClient({ region }),
-    identityPoolId,
-  });
-
   const file = req.body;
-
-  const s3 = new S3Client({
-    region,
-    credentials,
-  });
+  const s3 = getS3Client();
 
   const uploadParams: PutObjectCommandInput = {
     Bucket: bucketName,

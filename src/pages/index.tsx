@@ -1,10 +1,13 @@
 import type { NextPage } from "next";
 import styles from "../../styles/Home.module.css";
 import React from "react";
+import axios from "axios";
 
 const Home: NextPage = () => {
   const handleBtn = async () => {
-    const res = await fetch("/api/readData");
+    const res = await axios("/api/writeXLSX", {
+      method: "GET",
+    });
     console.log(res);
   };
 
@@ -13,14 +16,16 @@ const Home: NextPage = () => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("/api/upload", {
+    const res = await axios("/api/uploadURL", {
       method: "POST",
-      body: formData,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      data: { fileName: "data" },
     });
-    console.log(res);
+    const { uploadURL } = res.data;
+    const s3Res = await axios(uploadURL, {
+      method: "PUT",
+      data: formData,
+    });
+    console.log(s3Res);
   };
 
   return (
